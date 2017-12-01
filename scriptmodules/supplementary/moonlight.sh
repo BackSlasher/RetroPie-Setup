@@ -14,11 +14,17 @@ rp_module_desc="Standalone Steam Controller Driver"
 rp_module_desc="See source at https://github.com/irtimmer/moonlight-embedded"
 rp_module_licence="GNU3 https://raw.githubusercontent.com/irtimmer/moonlight-embedded/master/LICENSE"
 rp_module_section="exp"
-rp_module_flags="!x11" # TODO NITZ why this? copied from limelight
+#rp_module_flags="!x11" # TODO NITZ why this? copied from limelight
 
 # Based on https://github.com/TechWizTime/moonlight-retropie/blob/master/moonlight.sh
 
 function depends_moonlight() {
+
+    # Wget key
+    local tempfile
+    tempfile=$(mktemp)
+    wget 'http://archive.itimmer.nl/itimmer.gpg' -O "$tempfile"
+    apt-key add "$tempfile"
 
     # Set source
     # XXX NITZ Assuming Debian
@@ -26,16 +32,18 @@ function depends_moonlight() {
     DEB_CODENAME="$(awk -F"[)(]+" '/VERSION=/ {print $2}' /etc/os-release)"
     echo "deb http://archive.itimmer.nl/raspbian/moonlight ${DEB_CODENAME} main" > /etc/apt/sources.list.d/moonlight.list
     
-    getDepends 'moonlight-express'
+    getDepends 'moonlight-embedded'
 }
 
 function sources_moonlight() {
   # NITZ Empty
   # TODO get some art
+  echo "ffff"
 }
 
 function install_moonlight() {
   # NITZ Empty
+  echo "BBBBB"
 }
 
 ## @fn createscript_moonlight()
@@ -68,12 +76,12 @@ function configure_moonlight() {
 
   # Scripts
   createscript_moonlight 'moonlightconfig' "sudo $scriptdir/retropie_packages.sh moonlight configure"
-  createscript_moonlight 'stream' "moonlight stream"
-  createscript_moonlight 'stream' "moonlight quit"
+  createscript_moonlight 'stream' "moonlight stream -1080"
+  createscript_moonlight 'quit' "moonlight quit"
   # TODO more interesting ones: quit, pair, scan (to create list of games)
 }
 
-function gui_steamcontroller() {
+function gui_moonlight() {
     local cmd=(dialog --backtitle "$__backtitle" --menu "Choose an option." 22 86 16)
     local options=(
         1 "Pair"
